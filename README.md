@@ -26,6 +26,7 @@ This card is for [Lovelace](https://www.home-assistant.io/lovelace) on [Home Ass
 | type | string | **Required** | `custom:podcast-card`
 | username | string | **Required** | gPodder username
 | password | string | **Required** | gPodder password
+| name | string | **Optional** | Card name
 
 ## Installation
 
@@ -58,6 +59,7 @@ Add a custom element in your `ui-lovelace.yaml` or in the UI Editor as a Manual 
 type: 'custom:podcast-card'
 username: iantrich
 password: password
+name: Ian's Podcasts
 ```
 
 [Troubleshooting](https://github.com/thomasloven/hass-config/wiki/Lovelace-Plugins)

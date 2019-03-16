@@ -11,6 +11,7 @@ export interface PodcastCardConfig {
   type: string;
   username: string;
   password: string;
+  name?: string;
 }
 
 declare global {

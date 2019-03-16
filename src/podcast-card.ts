@@ -28,6 +28,16 @@ class PodcastCard extends LitElement {
       return html``;
     }
 
-    return html``;
+    return html`
+      <ha-card
+        .header=${this._config.name ? this._config.name : "Podcasts"}
+      ></ha-card>
+    `;
   }
+
+  // TODO On firstUpdated, get subscription list: https://gpoddernet.readthedocs.io/en/latest/api/reference/subscriptions.html#get-all-subscriptions
+  // TODO Get subscription changes every ~30 minutes: https://gpoddernet.readthedocs.io/en/latest/api/reference/subscriptions.html#get-subscription-changes
+  // TODO Search: https://gpoddernet.readthedocs.io/en/latest/api/reference/podcastlists.html
+  // TODO Add/Remove subscription: https://gpoddernet.readthedocs.io/en/latest/api/reference/subscriptions.html#upload-subscription-changes
+  // TODO Send url to media_player
 }
