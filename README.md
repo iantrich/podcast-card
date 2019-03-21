@@ -19,7 +19,7 @@ This card is for [Lovelace](https://www.home-assistant.io/lovelace) on [Home Ass
 | Name | Type | Requirement | Description
 | ---- | ---- | ------- | -----------
 | type | string | **Required** | `custom:podcast-card`
-| entity | string | **Required** | Podcast sensor entity
+| entity | string | **Required** | Podcast sensor entity e.g. [gPodder](https://github.com/custom-components/gpodder)
 | name | string | **Optional** | Card name `Podcasts`
 | icon | string | **Optional** | Target selection icon `mdi:speaker-multiple`
 | default_target | string | **Optional** | Default target to select on first load
