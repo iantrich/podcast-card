@@ -2063,6 +2063,53 @@ found at http://polymer.github.io/PATENTS.txt
 */
 const supportsAdoptingStyleSheets = ('adoptedStyleSheets' in Document.prototype) &&
     ('replace' in CSSStyleSheet.prototype);
+const constructionToken = Symbol();
+class CSSResult {
+    constructor(cssText, safeToken) {
+        if (safeToken !== constructionToken) {
+            throw new Error('CSSResult is not constructable. Use `unsafeCSS` or `css` instead.');
+        }
+        this.cssText = cssText;
+    }
+    // Note, this is a getter so that it's lazy. In practice, this means
+    // stylesheets are not created until the first element instance is made.
+    get styleSheet() {
+        if (this._styleSheet === undefined) {
+            // Note, if `adoptedStyleSheets` is supported then we assume CSSStyleSheet
+            // is constructable.
+            if (supportsAdoptingStyleSheets) {
+                this._styleSheet = new CSSStyleSheet();
+                this._styleSheet.replaceSync(this.cssText);
+            }
+            else {
+                this._styleSheet = null;
+            }
+        }
+        return this._styleSheet;
+    }
+    toString() {
+        return this.cssText;
+    }
+}
+const textFromCSSResult = (value) => {
+    if (value instanceof CSSResult) {
+        return value.cssText;
+    }
+    else {
+        throw new Error(`Value passed to 'css' function must be a 'css' function result: ${value}. Use 'unsafeCSS' to pass non-literal values, but
+            take care to ensure page security.`);
+    }
+};
+/**
+ * Template tag which which can be used with LitElement's `style` property to
+ * set element styles. For security reasons, only literal string values may be
+ * used. To incorporate non-literal values `unsafeCSS` may be used inside a
+ * template string part.
+ */
+const css = (strings, ...values) => {
+    const cssText = values.reduce((acc, v, idx) => acc + textFromCSSResult(v) + strings[idx + 1], strings[0]);
+    return new CSSResult(cssText, constructionToken);
+};
 
 /**
  * @license
@@ -2255,18 +2302,246 @@ LitElement.finalized = true;
  */
 LitElement.render = render$1;
 
+const fireEvent = (node, type, detail, options) => {
+    options = options || {};
+    detail = detail === null || detail === undefined ? {} : detail;
+    const event = new Event(type, {
+        bubbles: options.bubbles === undefined ? true : options.bubbles,
+        cancelable: Boolean(options.cancelable),
+        composed: options.composed === undefined ? true : options.composed
+    });
+    event.detail = detail;
+    node.dispatchEvent(event);
+    return event;
+};
+
 let PodcastCard = class PodcastCard extends LitElement {
     setConfig(config) {
-        if (!config || !config.username || !config.password) {
+        if (!config || !config.entity) {
             throw new Error("Invalid configuration");
         }
-        this._config = config;
+        this._config = Object.assign({ show_player: true }, config);
+        this._selectedPlayer = this._config.default_target;
+    }
+    getCardSize() {
+        return 6;
+    }
+    shouldUpdate(changedProps) {
+        if (changedProps.has("_config")) {
+            return true;
+        }
+        if (this._config.show_player) {
+            const playerDiv = this.shadowRoot.querySelector("#player");
+            const player = playerDiv.getElementsByTagName(this._config.custom_player
+                ? "mini-media-player"
+                : "hui-media-player-entity-row")[0];
+            player.hass = this.hass;
+        }
+        const oldHass = changedProps.get("hass");
+        if (oldHass) {
+            return (oldHass.states[this._config.entity] !==
+                this.hass.states[this._config.entity]);
+        }
+        return true;
     }
     render() {
         if (!this._config || !this.hass) {
             return html ``;
         }
-        return html ``;
+        const stateObj = this.hass.states[this._config.entity];
+        if (!stateObj) {
+            return html `
+        <ha-card>
+          <div class="warning">
+            Entity not available: ${this._config.entity}
+          </div>
+        </ha-card>
+      `;
+        }
+        const podcasts = stateObj.attributes["podcasts"];
+        const entityIds = Object.keys(this.hass.states).filter(eid => eid.substr(0, eid.indexOf(".")) === "media_player");
+        this._selectedPlayer = this._selectedPlayer
+            ? this._selectedPlayer
+            : entityIds
+                ? entityIds[0]
+                : "";
+        const player = this._config.custom_player
+            ? this.createThing({
+                type: "custom:mini-media-player",
+                entity: this._selectedPlayer,
+                group: true
+            })
+            : this.createThing({
+                type: "custom:hui-media-player-entity-row",
+                entity: this._selectedPlayer
+            });
+        player.hass = this.hass;
+        return html `
+      <ha-card .header=${this._config.name ? this._config.name : "Podcasts"}>
+        ${this._config.show_player
+            ? html `
+              <div id="player">
+                <paper-menu-button>
+                  <paper-icon-button
+                    .icon="${this._config.icon || "mdi:speaker-multiple"}"
+                    slot="dropdown-trigger"
+                  ></paper-icon-button>
+                  <paper-listbox slot="dropdown-content">
+                    ${entityIds.map(entity => html `
+                          <paper-item
+                            @click="${this._valueChanged}"
+                            .entity="${entity}"
+                            >${entity}</paper-item
+                          >
+                        `)}
+                  </paper-listbox>
+                </paper-menu-button>
+                ${player}
+              </div>
+            `
+            : html `
+              <div>
+                <paper-menu-button>
+                  <paper-icon-button
+                    .icon="${this._config.icon || "mdi:speaker-multiple"}"
+                    slot="dropdown-trigger"
+                  ></paper-icon-button>
+                  <paper-listbox slot="dropdown-content">
+                    ${entityIds.map(entity => html `
+                          <paper-item
+                            @click="${this._valueChanged}"
+                            .entity="${entity}"
+                            >${entity}</paper-item
+                          >
+                        `)}
+                  </paper-listbox>
+                </paper-menu-button>
+                <span
+                  >${this._selectedPlayer
+                ? this.hass.states[this._selectedPlayer].attributes
+                    .friendly_name
+                : ""}</span
+                >
+              </div>
+            `}
+
+        <ul>
+          ${podcasts.map(podcast => html `
+                <li
+                  @click="${this._togglePodcastEpisodes}"
+                  .podcast="${podcast.title.replace(/[ )(]/g, "-")}"
+                >
+                  ${podcast.title}
+                </li>
+                <ul
+                  class="episodes"
+                  id="${podcast.title.replace(/[ )(]/g, "-")}"
+                >
+                  ${podcast.episodes.map(episode => html `
+                        <li @click="${this._playEpisode}" .url="${episode.url}">
+                          <ha-icon
+                            icon="mdi:play-circle"
+                            .url="${episode.url}"
+                          ></ha-icon
+                          >${episode.title}
+                        </li>
+                      `)}
+                </ul>
+              `)}
+        </ul>
+      </ha-card>
+    `;
+    }
+    static get styles() {
+        return css `
+      .warning {
+        display: block;
+        color: black;
+        background-color: #fce588;
+        padding: 8px;
+      }
+
+      #player {
+        display: flex;
+      }
+
+      ul {
+        list-style: none;
+      }
+
+      li {
+        cursor: pointer;
+      }
+
+      .episodes {
+        display: none;
+      }
+    `;
+    }
+    createThing(cardConfig) {
+        const _createError = (error, config) => {
+            return _createThing("hui-error-card", {
+                type: "error",
+                error,
+                config
+            });
+        };
+        const _createThing = (tag, config) => {
+            const element = window.document.createElement(tag);
+            try {
+                element.setConfig(config);
+            }
+            catch (err) {
+                console.error(tag, err);
+                return _createError(err.message, config);
+            }
+            return element;
+        };
+        if (!cardConfig ||
+            typeof cardConfig !== "object" ||
+            !cardConfig.type ||
+            !cardConfig.type.startsWith("custom:"))
+            return _createError("No type configured", cardConfig);
+        const tag = cardConfig.type.substr("custom:".length);
+        if (customElements.get(tag))
+            return _createThing(tag, cardConfig);
+        // If element doesn't exist (yet) create an error
+        const element = _createError(`Custom element doesn't exist: ${cardConfig.type}.`, cardConfig);
+        element.style.display = "None";
+        const timer = setTimeout(() => {
+            element.style.display = "";
+        }, 2000);
+        // Remove error if element is defined later
+        customElements.whenDefined(cardConfig.type).then(() => {
+            clearTimeout(timer);
+            fireEvent(this, "ll-rebuild", {}, element);
+        });
+        return element;
+    }
+    _togglePodcastEpisodes(ev) {
+        const target = ev.target;
+        target.classList.toggle("active");
+        const list = this.shadowRoot.querySelector(`#${target.podcast.replace(/[ )(]/g, "-")}`);
+        if (list) {
+            if (list.style.display === "block") {
+                list.style.display = "none";
+            }
+            else {
+                list.style.display = "block";
+            }
+        }
+    }
+    _playEpisode(ev) {
+        const target = ev.target;
+        this.hass.callService("media_player", "play_media", {
+            entity_id: this._selectedPlayer,
+            media_content_id: target.url,
+            media_content_type: "audio/mp4"
+        });
+    }
+    _valueChanged(ev) {
+        const target = ev.target;
+        this._selectedPlayer = target.entity;
     }
 };
 __decorate([
@@ -2275,6 +2550,9 @@ __decorate([
 __decorate([
     property()
 ], PodcastCard.prototype, "_config", void 0);
+__decorate([
+    property()
+], PodcastCard.prototype, "_selectedPlayer", void 0);
 PodcastCard = __decorate([
     customElement("podcast-card")
 ], PodcastCard);
