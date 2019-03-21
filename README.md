@@ -14,6 +14,8 @@
 
 This card is for [Lovelace](https://www.home-assistant.io/lovelace) on [Home Assistant](https://www.home-assistant.io/) to display your podcast subscriptions and play them on your media players connected to Home Assistant
 
+![example](example.png)
+
 ## Options
 
 | Name | Type | Requirement | Description
