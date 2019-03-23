@@ -105,90 +105,69 @@ class PodcastCard extends LitElement {
     player.hass = this.hass;
 
     return html`
-      <ha-card .header=${this._config.name ? this._config.name : "Podcasts"}>
-        ${this._config.show_player
-          ? html`
-              <div id="player">
-                <paper-menu-button>
-                  <paper-icon-button
-                    .icon="${this._config.icon || "mdi:speaker-multiple"}"
-                    slot="dropdown-trigger"
-                  ></paper-icon-button>
-                  <paper-listbox slot="dropdown-content">
-                    ${entityIds.map(
-                      entity =>
-                        html`
-                          <paper-item
-                            @click="${this._valueChanged}"
-                            .entity="${entity}"
-                            >${entity}</paper-item
-                          >
-                        `
-                    )}
-                  </paper-listbox>
-                </paper-menu-button>
+      <ha-card>
+        <div class="header">
+          <paper-menu-button>
+            <paper-icon-button
+              .icon="${this._config.icon || "mdi:speaker-multiple"}"
+              slot="dropdown-trigger"
+              >${this.hass!.states[this._selectedPlayer].attributes
+                .friendly_name}</paper-icon-button
+            >
+            <paper-listbox slot="dropdown-content">
+              ${entityIds.map(
+                entity => html`
+                  <paper-item @click="${this._valueChanged}" .entity="${entity}"
+                    >${this.hass!.states[entity].attributes
+                      .friendly_name}</paper-item
+                  >
+                `
+              )}
+            </paper-listbox>
+          </paper-menu-button>
+          <div @click="${this._moreInfo}" class="title">
+            ${this._config.name || "Podcasts"}
+          </div>
+        </div>
+        <div id="player">
+          ${this._config.show_player
+            ? html`
                 ${player}
+              `
+            : ""}
+        </div>
+        <div class="divider"></div>
+        ${podcasts.map(
+          podcast =>
+            html`
+              <paper-item
+                @click="${this._togglePodcastEpisodes}"
+                .podcast="${podcast.title.replace(/[ )(]/g, "-")}"
+              >
+                ${podcast.title}
+              </paper-item>
+              <div
+                class="episodes"
+                id="${podcast.title.replace(/[ )(]/g, "-")}"
+              >
+                ${podcast.episodes.map(
+                  episode =>
+                    html`
+                      <paper-item
+                        @click="${this._playEpisode}"
+                        .url="${episode.url}"
+                      >
+                        <ha-icon
+                          icon="mdi:play-circle"
+                          .url="${episode.url}"
+                        ></ha-icon>
+                        <div>${episode.title}</div>
+                      </paper-item>
+                    `
+                )}
               </div>
             `
-          : html`
-              <div>
-                <paper-menu-button>
-                  <paper-icon-button
-                    .icon="${this._config.icon || "mdi:speaker-multiple"}"
-                    slot="dropdown-trigger"
-                  ></paper-icon-button>
-                  <paper-listbox slot="dropdown-content">
-                    ${entityIds.map(
-                      entity =>
-                        html`
-                          <paper-item
-                            @click="${this._valueChanged}"
-                            .entity="${entity}"
-                            >${entity}</paper-item
-                          >
-                        `
-                    )}
-                  </paper-listbox>
-                </paper-menu-button>
-                <span
-                  >${this._selectedPlayer
-                    ? this.hass.states[this._selectedPlayer].attributes
-                        .friendly_name
-                    : ""}</span
-                >
-              </div>
-            `}
-
-        <ul>
-          ${podcasts.map(
-            podcast =>
-              html`
-                <li
-                  @click="${this._togglePodcastEpisodes}"
-                  .podcast="${podcast.title.replace(/[ )(]/g, "-")}"
-                >
-                  ${podcast.title}
-                </li>
-                <ul
-                  class="episodes"
-                  id="${podcast.title.replace(/[ )(]/g, "-")}"
-                >
-                  ${podcast.episodes.map(
-                    episode =>
-                      html`
-                        <li @click="${this._playEpisode}" .url="${episode.url}">
-                          <ha-icon
-                            icon="mdi:play-circle"
-                            .url="${episode.url}"
-                          ></ha-icon
-                          >${episode.title}
-                        </li>
-                      `
-                  )}
-                </ul>
-              `
-          )}
-        </ul>
+        )}
       </ha-card>
     `;
   }
@@ -202,22 +181,59 @@ class PodcastCard extends LitElement {
         padding: 8px;
       }
 
-      #player {
+      .header {
+        /* start paper-font-headline style */
+        font-family: "Roboto", "Noto", sans-serif;
+        -webkit-font-smoothing: antialiased; /* OS X subpixel AA bleed bug */
+        text-rendering: optimizeLegibility;
+        font-size: 24px;
+        font-weight: 400;
+        letter-spacing: -0.012em;
+        /* end paper-font-headline style */
+
+        line-height: 40px;
+        padding: 8px;
+        cursor: pointer;
         display: flex;
       }
 
-      ul {
-        list-style: none;
+      .title {
+        padding-top: 8px;
       }
 
-      li {
+      #player {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      paper-item {
         cursor: pointer;
+      }
+
+      paper-item > div {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .episodes {
         display: none;
       }
+
+      ha-icon {
+        padding-right: 16px;
+      }
+
+      paper-icon-button {
+        color: var(--primary-color);
+      }
     `;
+  }
+
+  private _moreInfo(): void {
+    fireEvent(this, "hass-more-info", {
+      entityId: this._config!.entity
+    });
   }
 
   private createThing(cardConfig) {
