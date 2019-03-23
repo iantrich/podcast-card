@@ -1543,7 +1543,6 @@ class UpdatingElement extends HTMLElement {
         Object.defineProperty(this.prototype, name, {
             // tslint:disable-next-line:no-any no symbol in index
             get() {
-                // tslint:disable-next-line:no-any no symbol in index
                 return this[key];
             },
             set(value) {
@@ -1551,7 +1550,7 @@ class UpdatingElement extends HTMLElement {
                 const oldValue = this[name];
                 // tslint:disable-next-line:no-any no symbol in index
                 this[key] = value;
-                this.requestUpdate(name, oldValue);
+                this._requestUpdate(name, oldValue);
             },
             configurable: true,
             enumerable: true
@@ -1655,6 +1654,8 @@ class UpdatingElement extends HTMLElement {
      */
     initialize() {
         this._saveInstanceProperties();
+        // ensures first update will be caught by an early access of `updateComplete`
+        this._requestUpdate();
     }
     /**
      * Fixes any properties set on the instance before upgrade time.
@@ -1695,16 +1696,13 @@ class UpdatingElement extends HTMLElement {
     }
     connectedCallback() {
         this._updateState = this._updateState | STATE_HAS_CONNECTED;
-        // Ensure connection triggers an update. Updates cannot complete before
+        // Ensure first connection completes an update. Updates cannot complete before
         // connection and if one is pending connection the `_hasConnectionResolver`
         // will exist. If so, resolve it to complete the update, otherwise
         // requestUpdate.
         if (this._hasConnectedResolver) {
             this._hasConnectedResolver();
             this._hasConnectedResolver = undefined;
-        }
-        else {
-            this.requestUpdate();
         }
     }
     /**
@@ -1770,6 +1768,42 @@ class UpdatingElement extends HTMLElement {
         }
     }
     /**
+     * This private version of `requestUpdate` does not access or return the
+     * `updateComplete` promise. This promise can be overridden and is therefore
+     * not free to access.
+     */
+    _requestUpdate(name, oldValue) {
+        let shouldRequestUpdate = true;
+        // If we have a property key, perform property update steps.
+        if (name !== undefined) {
+            const ctor = this.constructor;
+            const options = ctor._classProperties.get(name) || defaultPropertyDeclaration;
+            if (ctor._valueHasChanged(this[name], oldValue, options.hasChanged)) {
+                if (!this._changedProperties.has(name)) {
+                    this._changedProperties.set(name, oldValue);
+                }
+                // Add to reflecting properties set.
+                // Note, it's important that every change has a chance to add the
+                // property to `_reflectingProperties`. This ensures setting
+                // attribute + property reflects correctly.
+                if (options.reflect === true &&
+                    !(this._updateState & STATE_IS_REFLECTING_TO_PROPERTY)) {
+                    if (this._reflectingProperties === undefined) {
+                        this._reflectingProperties = new Map();
+                    }
+                    this._reflectingProperties.set(name, options);
+                }
+            }
+            else {
+                // Abort the request if the property should not be considered changed.
+                shouldRequestUpdate = false;
+            }
+        }
+        if (!this._hasRequestedUpdate && shouldRequestUpdate) {
+            this._enqueueUpdate();
+        }
+    }
+    /**
      * Requests an update which is processed asynchronously. This should
      * be called when an element should update based on some state not triggered
      * by setting a property. In this case, pass no arguments. It should also be
@@ -1783,31 +1817,7 @@ class UpdatingElement extends HTMLElement {
      * @returns {Promise} A Promise that is resolved when the update completes.
      */
     requestUpdate(name, oldValue) {
-        let shouldRequestUpdate = true;
-        // if we have a property key, perform property update steps.
-        if (name !== undefined && !this._changedProperties.has(name)) {
-            const ctor = this.constructor;
-            const options = ctor._classProperties.get(name) || defaultPropertyDeclaration;
-            if (ctor._valueHasChanged(this[name], oldValue, options.hasChanged)) {
-                // track old value when changing.
-                this._changedProperties.set(name, oldValue);
-                // add to reflecting properties set
-                if (options.reflect === true &&
-                    !(this._updateState & STATE_IS_REFLECTING_TO_PROPERTY)) {
-                    if (this._reflectingProperties === undefined) {
-                        this._reflectingProperties = new Map();
-                    }
-                    this._reflectingProperties.set(name, options);
-                }
-                // abort the request if the property should not be considered changed.
-            }
-            else {
-                shouldRequestUpdate = false;
-            }
-        }
-        if (!this._hasRequestedUpdate && shouldRequestUpdate) {
-            this._enqueueUpdate();
-        }
+        this._requestUpdate(name, oldValue);
         return this.updateComplete;
     }
     /**
@@ -1817,22 +1827,36 @@ class UpdatingElement extends HTMLElement {
         // Mark state updating...
         this._updateState = this._updateState | STATE_UPDATE_REQUESTED;
         let resolve;
+        let reject;
         const previousUpdatePromise = this._updatePromise;
-        this._updatePromise = new Promise((res) => resolve = res);
-        // Ensure any previous update has resolved before updating.
-        // This `await` also ensures that property changes are batched.
-        await previousUpdatePromise;
+        this._updatePromise = new Promise((res, rej) => {
+            resolve = res;
+            reject = rej;
+        });
+        try {
+            // Ensure any previous update has resolved before updating.
+            // This `await` also ensures that property changes are batched.
+            await previousUpdatePromise;
+        }
+        catch (e) {
+            // Ignore any previous errors. We only care that the previous cycle is
+            // done. Any error should have been handled in the previous update.
+        }
         // Make sure the element has connected before updating.
         if (!this._hasConnected) {
             await new Promise((res) => this._hasConnectedResolver = res);
         }
-        // Allow `performUpdate` to be asynchronous to enable scheduling of updates.
-        const result = this.performUpdate();
-        // Note, this is to avoid delaying an additional microtask unless we need
-        // to.
-        if (result != null &&
-            typeof result.then === 'function') {
-            await result;
+        try {
+            const result = this.performUpdate();
+            // If `performUpdate` returns a Promise, we await it. This is done to
+            // enable coordinating updates with a scheduler. Note, the result is
+            // checked to avoid delaying an additional microtask unless we need to.
+            if (result != null) {
+                await result;
+            }
+        }
+        catch (e) {
+            reject(e);
         }
         resolve(!this._hasRequestedUpdate);
     }
@@ -1846,10 +1870,13 @@ class UpdatingElement extends HTMLElement {
         return (this._updateState & STATE_HAS_UPDATED);
     }
     /**
-     * Performs an element update.
+     * Performs an element update. Note, if an exception is thrown during the
+     * update, `firstUpdated` and `updated` will not be called.
      *
-     * You can override this method to change the timing of updates. For instance,
-     * to schedule updates to occur just before the next frame:
+     * You can override this method to change the timing of updates. If this
+     * method is overridden, `super.performUpdate()` must be called.
+     *
+     * For instance, to schedule updates to occur just before the next frame:
      *
      * ```
      * protected async performUpdate(): Promise<unknown> {
@@ -1863,18 +1890,30 @@ class UpdatingElement extends HTMLElement {
         if (this._instanceProperties) {
             this._applyInstanceProperties();
         }
-        if (this.shouldUpdate(this._changedProperties)) {
-            const changedProperties = this._changedProperties;
-            this.update(changedProperties);
+        let shouldUpdate = false;
+        const changedProperties = this._changedProperties;
+        try {
+            shouldUpdate = this.shouldUpdate(changedProperties);
+            if (shouldUpdate) {
+                this.update(changedProperties);
+            }
+        }
+        catch (e) {
+            // Prevent `firstUpdated` and `updated` from running when there's an
+            // update exception.
+            shouldUpdate = false;
+            throw e;
+        }
+        finally {
+            // Ensure element can accept additional updates after an exception.
             this._markUpdated();
+        }
+        if (shouldUpdate) {
             if (!(this._updateState & STATE_HAS_UPDATED)) {
                 this._updateState = this._updateState | STATE_HAS_UPDATED;
                 this.firstUpdated(changedProperties);
             }
             this.updated(changedProperties);
-        }
-        else {
-            this._markUpdated();
         }
     }
     _markUpdated() {
@@ -1885,7 +1924,8 @@ class UpdatingElement extends HTMLElement {
      * Returns a Promise that resolves when the element has completed updating.
      * The Promise value is a boolean that is `true` if the element completed the
      * update without triggering another update. The Promise result is `false` if
-     * a property was set inside `updated()`. This getter can be implemented to
+     * a property was set inside `updated()`. If the Promise is rejected, an
+     * exception was thrown during the update. This getter can be implemented to
      * await additional state. For example, it is sometimes useful to await a
      * rendered element before fulfilling this Promise. To do this, first await
      * `super.updateComplete` then any subsequent state.
@@ -2196,7 +2236,8 @@ class LitElement extends UpdatingElement {
      */
     initialize() {
         super.initialize();
-        this.renderRoot = this.createRenderRoot();
+        this.renderRoot =
+            this.createRenderRoot();
         // Note, if renderRoot is not a shadowRoot, styles would/could apply to the
         // element's getRootNode(). While this could be done, we're choosing not to
         // support this now since it would require different logic around de-duping.
@@ -2406,8 +2447,8 @@ let PodcastCard = class PodcastCard extends LitElement {
               `
             : ""}
         </div>
-        <div class="divider"></div>
         ${podcasts.map(podcast => html `
+              <div class="divider"></div>
               <paper-item
                 @click="${this._togglePodcastEpisodes}"
                 .podcast="${podcast.title.replace(/[ )(]/g, "-")}"
@@ -2423,11 +2464,7 @@ let PodcastCard = class PodcastCard extends LitElement {
                         @click="${this._playEpisode}"
                         .url="${episode.url}"
                       >
-                        <ha-icon
-                          icon="mdi:play-circle"
-                          .url="${episode.url}"
-                        ></ha-icon>
-                        <div>${episode.title}</div>
+                        <div .url="${episode.url}">${episode.title}</div>
                       </paper-item>
                     `)}
               </div>
@@ -2471,16 +2508,24 @@ let PodcastCard = class PodcastCard extends LitElement {
 
       paper-item {
         cursor: pointer;
+        --paper-item-min-height: 32px;
       }
 
       paper-item > div {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        color: var(--secondary-text-color);
+        font-size: 10px;
       }
 
       .episodes {
         display: none;
+      }
+
+      .episodes > paper-item {
+        padding-left: 24px;
+        --paper-item-min-height: 24px;
       }
 
       ha-icon {

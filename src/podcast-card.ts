@@ -136,10 +136,10 @@ class PodcastCard extends LitElement {
               `
             : ""}
         </div>
-        <div class="divider"></div>
         ${podcasts.map(
           podcast =>
             html`
+              <div class="divider"></div>
               <paper-item
                 @click="${this._togglePodcastEpisodes}"
                 .podcast="${podcast.title.replace(/[ )(]/g, "-")}"
@@ -157,11 +157,7 @@ class PodcastCard extends LitElement {
                         @click="${this._playEpisode}"
                         .url="${episode.url}"
                       >
-                        <ha-icon
-                          icon="mdi:play-circle"
-                          .url="${episode.url}"
-                        ></ha-icon>
-                        <div>${episode.title}</div>
+                        <div .url="${episode.url}">${episode.title}</div>
                       </paper-item>
                     `
                 )}
@@ -208,16 +204,24 @@ class PodcastCard extends LitElement {
 
       paper-item {
         cursor: pointer;
+        --paper-item-min-height: 32px;
       }
 
       paper-item > div {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        color: var(--secondary-text-color);
+        font-size: 10px;
       }
 
       .episodes {
         display: none;
+      }
+
+      .episodes > paper-item {
+        padding-left: 24px;
+        --paper-item-min-height: 24px;
       }
 
       ha-icon {
