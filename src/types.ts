@@ -38,8 +38,8 @@ export interface Episode {
 declare global {
   // for fire event
   interface HASSDomEvents {
-    "value-changed": {
-      value: unknown;
+    "hass-more-info": {
+      entityId: string | null;
     };
     "config-changed": {
       config: PodcastCardConfig;
