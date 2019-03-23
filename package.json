@@ -1,6 +1,6 @@
 {
     "name": "podcast-card",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Lovelace podcast-card",
     "keywords": [
         "home-assistant",
@@ -15,9 +15,9 @@
     "author": "Ian Richardson <iantrich@gmail.com>",
     "license": "MIT",
     "dependencies": {
-        "lit-element": "^2.0.1",
+        "lit-element": "^2.1.0",
         "superstruct": "^0.6.0",
-        "home-assistant-js-websocket": "^3.3.0"
+        "home-assistant-js-websocket": "^3.4.0"
     },
     "devDependencies": {
         "@typescript-eslint/parser": "^1.4.1",
