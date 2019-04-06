@@ -158,7 +158,12 @@ class PodcastCard extends LitElement {
                         .url="${episode.url}"
                         .mime_type="${episode.mime_type}"
                       >
-                        <div .url="${episode.url}" .mime_type="${episode.mime_type}">${episode.title}</div>
+                        <div
+                          .url="${episode.url}"
+                          .mime_type="${episode.mime_type}"
+                        >
+                          ${episode.title}
+                        </div>
                       </paper-item>
                     `
                 )}
