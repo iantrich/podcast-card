@@ -1,5 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
+import babel from 'rollup-plugin-babel';
 
 export default {
   input: ['src/podcast-card.ts'],
@@ -7,5 +8,7 @@ export default {
     dir: './dist',
     format: 'es',
   },
-  plugins: [resolve(), typescript()],
+  plugins: [resolve(), typescript(), babel({
+    exclude: 'node_modules/**'
+  })],
 };
