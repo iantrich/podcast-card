@@ -12,6 +12,9 @@
 [![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
+[![Twitter][twitter]][twitter]
+[![Github][github]][github]
+
 This card is for [Lovelace](https://www.home-assistant.io/lovelace) on [Home Assistant](https://www.home-assistant.io/) to display your podcast subscriptions and play them on your media players connected to Home Assistant
 
 ![example](example.png)
@@ -80,3 +83,5 @@ custom_player: True
 [maintenance-shield]: https://img.shields.io/badge/maintainer-Ian%20Richardson%20%40iantrich-blue.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/release/custom-cards/podcast-card.svg?style=for-the-badge
 [releases]: https://github.com/custom-cards/podcast-card/releases
+[twitter]: https://img.shields.io/twitter/follow/iantrich.svg?style=social
+[github]: https://img.shields.io/github/followers/iantrich.svg?style=social
