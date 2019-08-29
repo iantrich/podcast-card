@@ -8,9 +8,9 @@ import {
   CSSResult,
   PropertyValues
 } from "lit-element";
+import { HomeAssistant, fireEvent } from "custom-card-helpers";
 
-import { PodcastCardConfig, HomeAssistant, Podcast } from "./types";
-import { fireEvent } from "./fire-event";
+import { PodcastCardConfig, Podcast } from "./types";
 
 @customElement("podcast-card")
 class PodcastCard extends LitElement {
