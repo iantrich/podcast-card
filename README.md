@@ -30,6 +30,7 @@ This card is for [Lovelace](https://www.home-assistant.io/lovelace) on [Home Ass
 | default_target | string | **Optional** | Default target to select on first load
 | show_player | boolean | **Optional** | Show media player controls? `True`
 | custom_player | boolean | **Optional** | Use [mini-media-player](https://github.com/kalkih/mini-media-player)? `False` **Note: Requires installation of `mini-media-player`**
+| mime_type | string | **Optional** | Specify custom mime_type for your player if the passed one is not working
 
 ## Installation
 

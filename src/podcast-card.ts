@@ -315,7 +315,7 @@ class PodcastCard extends LitElement {
     this.hass!.callService("media_player", "play_media", {
       entity_id: this._selectedPlayer,
       media_content_id: target.url,
-      media_content_type: target.mime_type
+      media_content_type: this._config!.mime_type ? this._config!.mime_type : target.mime_type
     });
   }
 

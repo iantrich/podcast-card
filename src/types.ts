@@ -15,6 +15,7 @@ export interface PodcastCardConfig {
   default_target?: string;
   show_player?: boolean;
   custom_player?: boolean;
+  mime_type?: string;
 }
 
 export interface Podcast {
