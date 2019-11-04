@@ -11,13 +11,19 @@ import {
 import { HomeAssistant, fireEvent } from "custom-card-helpers";
 
 import { PodcastCardConfig, Podcast } from "./types";
+import { CARD_VERSION } from "./const";
+
+/* eslint no-console: 0 */
+console.info(
+  `%c  PODCAST-CARD  \n%c  Version ${CARD_VERSION} `,
+  "color: orange; font-weight: bold; background: black",
+  "color: white; font-weight: bold; background: dimgray"
+);
 
 @customElement("podcast-card")
 class PodcastCard extends LitElement {
   @property() public hass?: HomeAssistant;
-
   @property() private _config?: PodcastCardConfig;
-
   @property() private _selectedPlayer?: string;
 
   public setConfig(config: PodcastCardConfig): void {
@@ -26,7 +32,6 @@ class PodcastCard extends LitElement {
     }
 
     this._config = { show_player: true, ...config };
-
     this._selectedPlayer = this._config.default_target;
   }
 
