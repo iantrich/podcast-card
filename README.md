@@ -1,4 +1,5 @@
 # Podcast Card
+
 🎧 [gPodder](https://gpodder.net/) Podcast Card
 
 [![GitHub Release][releases-shield]][releases]
@@ -38,21 +39,21 @@ resources:
 
 ## Options
 
-| Name | Type | Requirement | Description
-| ---- | ---- | ------- | -----------
-| `type` | `string` | **Required** | `custom:podcast-card`
-| `entity` | `string` | **Required** | Podcast sensor entity e.g. [gPodder](https://github.com/custom-components/gpodder)
-| `name` | `string` | **Optional** | Card name `Podcasts`
-| `icon` | `string` | **Optional** | Target selection icon `mdi:speaker-multiple`
-| `default_target` | `string` | **Optional** | Default target to select on first load
-| `show_player` | `boolean` | **Optional** | Show media player controls? `True`
-| `custom_player` | `boolean` | **Optional** | Use [mini-media-player](https://github.com/kalkih/mini-media-player)? `False` **Note: Requires installation of `mini-media-player`**
-| `mime_type` | `string` | **Optional** | Specify custom mime_type for your player if the passed one is not working
+| Name             | Type      | Requirement  | Description                                                                                                                          |
+| ---------------- | --------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `type`           | `string`  | **Required** | `custom:podcast-card`                                                                                                                |
+| `entity`         | `string`  | **Required** | Podcast sensor entity e.g. [gPodder](https://github.com/custom-components/gpodder)                                                   |
+| `name`           | `string`  | **Optional** | Card name `Podcasts`                                                                                                                 |
+| `icon`           | `string`  | **Optional** | Target selection icon `mdi:speaker-multiple`                                                                                         |
+| `default_target` | `string`  | **Optional** | Default target to select on first load                                                                                               |
+| `show_player`    | `boolean` | **Optional** | Show media player controls? `True`                                                                                                   |
+| `custom_player`  | `boolean` | **Optional** | Use [mini-media-player](https://github.com/kalkih/mini-media-player)? `False` **Note: Requires installation of `mini-media-player`** |
+| `mime_type`      | `string`  | **Optional** | Specify custom mime_type for your player if the passed one is not working                                                            |
 
 ### Usage
 
 ```yaml
-type: 'custom:podcast-card'
+type: "custom:podcast-card"
 entity: sensor.gpodder
 name: Ian's Podcasts
 default_target: media_player.office_home

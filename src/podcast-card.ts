@@ -151,10 +151,7 @@ class PodcastCard extends LitElement {
               >
                 ${podcast.title}
               </paper-item>
-              <div
-                class="episodes"
-                id="podcast${index}"
-              >
+              <div class="episodes" id="podcast${index}">
                 ${podcast.episodes.map(
                   episode =>
                     html`
@@ -304,7 +301,9 @@ class PodcastCard extends LitElement {
   private _togglePodcastEpisodes(ev: Event): void {
     const target = ev.target as any;
     target.classList.toggle("active");
-    const list = this.shadowRoot!.querySelector(`#podcast${target.podcast}`) as HTMLElement;
+    const list = this.shadowRoot!.querySelector(
+      `#podcast${target.podcast}`
+    ) as HTMLElement;
 
     if (list) {
       if (list.style.display === "block") {
@@ -320,7 +319,9 @@ class PodcastCard extends LitElement {
     this.hass!.callService("media_player", "play_media", {
       entity_id: this._selectedPlayer,
       media_content_id: target.url,
-      media_content_type: this._config!.mime_type ? this._config!.mime_type : target.mime_type
+      media_content_type: this._config!.mime_type
+        ? this._config!.mime_type
+        : target.mime_type
     });
   }
 

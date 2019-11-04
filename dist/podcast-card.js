@@ -2934,10 +2934,7 @@ let PodcastCard = class PodcastCard extends LitElement {
               >
                 ${podcast.title}
               </paper-item>
-              <div
-                class="episodes"
-                id="podcast${index}"
-              >
+              <div class="episodes" id="podcast${index}">
                 ${podcast.episodes.map(episode => html `
                       <paper-item
                         @click="${this._playEpisode}"
@@ -3085,7 +3082,9 @@ let PodcastCard = class PodcastCard extends LitElement {
         this.hass.callService("media_player", "play_media", {
             entity_id: this._selectedPlayer,
             media_content_id: target.url,
-            media_content_type: this._config.mime_type ? this._config.mime_type : target.mime_type
+            media_content_type: this._config.mime_type
+                ? this._config.mime_type
+                : target.mime_type
         });
     }
     _valueChanged(ev) {
