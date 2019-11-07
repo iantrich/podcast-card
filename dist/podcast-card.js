@@ -56,7 +56,7 @@ const isDirective = (o) => {
  */
 const isCEPolyfill = window.customElements !== undefined &&
     window.customElements.polyfillWrapFlushCallback !==
-        undefined;
+    undefined;
 /**
  * Removes nodes, starting from `start` (inclusive) to `end` (exclusive), from
  * `container`.
@@ -933,9 +933,9 @@ class EventPart {
         const oldListener = this.value;
         const shouldRemoveListener = newListener == null ||
             oldListener != null &&
-                (newListener.capture !== oldListener.capture ||
-                    newListener.once !== oldListener.once ||
-                    newListener.passive !== oldListener.passive);
+            (newListener.capture !== oldListener.capture ||
+                newListener.once !== oldListener.once ||
+                newListener.passive !== oldListener.passive);
         const shouldAddListener = newListener != null && (oldListener == null || shouldRemoveListener);
         if (shouldRemoveListener) {
             this.element.removeEventListener(this.eventName, this.__boundHandleEvent, this.__options);
@@ -1804,15 +1804,15 @@ class UpdatingElement extends HTMLElement {
         // expecting arrays
         this.constructor
             ._classProperties.forEach((_v, p) => {
-            if (this.hasOwnProperty(p)) {
-                const value = this[p];
-                delete this[p];
-                if (!this._instanceProperties) {
-                    this._instanceProperties = new Map();
+                if (this.hasOwnProperty(p)) {
+                    const value = this[p];
+                    delete this[p];
+                    if (!this._instanceProperties) {
+                        this._instanceProperties = new Map();
+                    }
+                    this._instanceProperties.set(p, value);
                 }
-                this._instanceProperties.set(p, value);
-            }
-        });
+            });
     }
     /**
      * Applies previously saved instance properties.
@@ -2191,9 +2191,11 @@ const standardProperty = (options, element) => {
     // stomp over the user's accessor.
     if (element.kind === 'method' && element.descriptor &&
         !('value' in element.descriptor)) {
-        return Object.assign({}, element, { finisher(clazz) {
+        return Object.assign({}, element, {
+            finisher(clazz) {
                 clazz.createProperty(element.key, options);
-            } });
+            }
+        });
     }
     else {
         // createProperty() takes care of defining the property, but we still
@@ -2517,33 +2519,33 @@ var noop = function () {
 };
 
 function regexEscape(str) {
-  return str.replace( /[|\\{()[^$+*?.-]/g, '\\$&');
+    return str.replace(/[|\\{()[^$+*?.-]/g, '\\$&');
 }
 
 function shorten(arr, sLen) {
-  var newArr = [];
-  for (var i = 0, len = arr.length; i < len; i++) {
-    newArr.push(arr[i].substr(0, sLen));
-  }
-  return newArr;
+    var newArr = [];
+    for (var i = 0, len = arr.length; i < len; i++) {
+        newArr.push(arr[i].substr(0, sLen));
+    }
+    return newArr;
 }
 
 function monthUpdate(arrName) {
-  return function (d, v, i18n) {
-    var index = i18n[arrName].indexOf(v.charAt(0).toUpperCase() + v.substr(1).toLowerCase());
-    if (~index) {
-      d.month = index;
-    }
-  };
+    return function (d, v, i18n) {
+        var index = i18n[arrName].indexOf(v.charAt(0).toUpperCase() + v.substr(1).toLowerCase());
+        if (~index) {
+            d.month = index;
+        }
+    };
 }
 
 function pad(val, len) {
-  val = String(val);
-  len = len || 2;
-  while (val.length < len) {
-    val = '0' + val;
-  }
-  return val;
+    val = String(val);
+    len = len || 2;
+    while (val.length < len) {
+        val = '0' + val;
+    }
+    return val;
 }
 
 var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -2551,156 +2553,156 @@ var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July'
 var monthNamesShort = shorten(monthNames, 3);
 var dayNamesShort = shorten(dayNames, 3);
 fecha.i18n = {
-  dayNamesShort: dayNamesShort,
-  dayNames: dayNames,
-  monthNamesShort: monthNamesShort,
-  monthNames: monthNames,
-  amPm: ['am', 'pm'],
-  DoFn: function DoFn(D) {
-    return D + ['th', 'st', 'nd', 'rd'][D % 10 > 3 ? 0 : (D - D % 10 !== 10) * D % 10];
-  }
+    dayNamesShort: dayNamesShort,
+    dayNames: dayNames,
+    monthNamesShort: monthNamesShort,
+    monthNames: monthNames,
+    amPm: ['am', 'pm'],
+    DoFn: function DoFn(D) {
+        return D + ['th', 'st', 'nd', 'rd'][D % 10 > 3 ? 0 : (D - D % 10 !== 10) * D % 10];
+    }
 };
 
 var formatFlags = {
-  D: function(dateObj) {
-    return dateObj.getDate();
-  },
-  DD: function(dateObj) {
-    return pad(dateObj.getDate());
-  },
-  Do: function(dateObj, i18n) {
-    return i18n.DoFn(dateObj.getDate());
-  },
-  d: function(dateObj) {
-    return dateObj.getDay();
-  },
-  dd: function(dateObj) {
-    return pad(dateObj.getDay());
-  },
-  ddd: function(dateObj, i18n) {
-    return i18n.dayNamesShort[dateObj.getDay()];
-  },
-  dddd: function(dateObj, i18n) {
-    return i18n.dayNames[dateObj.getDay()];
-  },
-  M: function(dateObj) {
-    return dateObj.getMonth() + 1;
-  },
-  MM: function(dateObj) {
-    return pad(dateObj.getMonth() + 1);
-  },
-  MMM: function(dateObj, i18n) {
-    return i18n.monthNamesShort[dateObj.getMonth()];
-  },
-  MMMM: function(dateObj, i18n) {
-    return i18n.monthNames[dateObj.getMonth()];
-  },
-  YY: function(dateObj) {
-    return pad(String(dateObj.getFullYear()), 4).substr(2);
-  },
-  YYYY: function(dateObj) {
-    return pad(dateObj.getFullYear(), 4);
-  },
-  h: function(dateObj) {
-    return dateObj.getHours() % 12 || 12;
-  },
-  hh: function(dateObj) {
-    return pad(dateObj.getHours() % 12 || 12);
-  },
-  H: function(dateObj) {
-    return dateObj.getHours();
-  },
-  HH: function(dateObj) {
-    return pad(dateObj.getHours());
-  },
-  m: function(dateObj) {
-    return dateObj.getMinutes();
-  },
-  mm: function(dateObj) {
-    return pad(dateObj.getMinutes());
-  },
-  s: function(dateObj) {
-    return dateObj.getSeconds();
-  },
-  ss: function(dateObj) {
-    return pad(dateObj.getSeconds());
-  },
-  S: function(dateObj) {
-    return Math.round(dateObj.getMilliseconds() / 100);
-  },
-  SS: function(dateObj) {
-    return pad(Math.round(dateObj.getMilliseconds() / 10), 2);
-  },
-  SSS: function(dateObj) {
-    return pad(dateObj.getMilliseconds(), 3);
-  },
-  a: function(dateObj, i18n) {
-    return dateObj.getHours() < 12 ? i18n.amPm[0] : i18n.amPm[1];
-  },
-  A: function(dateObj, i18n) {
-    return dateObj.getHours() < 12 ? i18n.amPm[0].toUpperCase() : i18n.amPm[1].toUpperCase();
-  },
-  ZZ: function(dateObj) {
-    var o = dateObj.getTimezoneOffset();
-    return (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4);
-  }
+    D: function (dateObj) {
+        return dateObj.getDate();
+    },
+    DD: function (dateObj) {
+        return pad(dateObj.getDate());
+    },
+    Do: function (dateObj, i18n) {
+        return i18n.DoFn(dateObj.getDate());
+    },
+    d: function (dateObj) {
+        return dateObj.getDay();
+    },
+    dd: function (dateObj) {
+        return pad(dateObj.getDay());
+    },
+    ddd: function (dateObj, i18n) {
+        return i18n.dayNamesShort[dateObj.getDay()];
+    },
+    dddd: function (dateObj, i18n) {
+        return i18n.dayNames[dateObj.getDay()];
+    },
+    M: function (dateObj) {
+        return dateObj.getMonth() + 1;
+    },
+    MM: function (dateObj) {
+        return pad(dateObj.getMonth() + 1);
+    },
+    MMM: function (dateObj, i18n) {
+        return i18n.monthNamesShort[dateObj.getMonth()];
+    },
+    MMMM: function (dateObj, i18n) {
+        return i18n.monthNames[dateObj.getMonth()];
+    },
+    YY: function (dateObj) {
+        return pad(String(dateObj.getFullYear()), 4).substr(2);
+    },
+    YYYY: function (dateObj) {
+        return pad(dateObj.getFullYear(), 4);
+    },
+    h: function (dateObj) {
+        return dateObj.getHours() % 12 || 12;
+    },
+    hh: function (dateObj) {
+        return pad(dateObj.getHours() % 12 || 12);
+    },
+    H: function (dateObj) {
+        return dateObj.getHours();
+    },
+    HH: function (dateObj) {
+        return pad(dateObj.getHours());
+    },
+    m: function (dateObj) {
+        return dateObj.getMinutes();
+    },
+    mm: function (dateObj) {
+        return pad(dateObj.getMinutes());
+    },
+    s: function (dateObj) {
+        return dateObj.getSeconds();
+    },
+    ss: function (dateObj) {
+        return pad(dateObj.getSeconds());
+    },
+    S: function (dateObj) {
+        return Math.round(dateObj.getMilliseconds() / 100);
+    },
+    SS: function (dateObj) {
+        return pad(Math.round(dateObj.getMilliseconds() / 10), 2);
+    },
+    SSS: function (dateObj) {
+        return pad(dateObj.getMilliseconds(), 3);
+    },
+    a: function (dateObj, i18n) {
+        return dateObj.getHours() < 12 ? i18n.amPm[0] : i18n.amPm[1];
+    },
+    A: function (dateObj, i18n) {
+        return dateObj.getHours() < 12 ? i18n.amPm[0].toUpperCase() : i18n.amPm[1].toUpperCase();
+    },
+    ZZ: function (dateObj) {
+        var o = dateObj.getTimezoneOffset();
+        return (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4);
+    }
 };
 
 var parseFlags = {
-  D: [twoDigits, function (d, v) {
-    d.day = v;
-  }],
-  Do: [twoDigits + word, function (d, v) {
-    d.day = parseInt(v, 10);
-  }],
-  M: [twoDigits, function (d, v) {
-    d.month = v - 1;
-  }],
-  YY: [twoDigits, function (d, v) {
-    var da = new Date(), cent = +('' + da.getFullYear()).substr(0, 2);
-    d.year = '' + (v > 68 ? cent - 1 : cent) + v;
-  }],
-  h: [twoDigits, function (d, v) {
-    d.hour = v;
-  }],
-  m: [twoDigits, function (d, v) {
-    d.minute = v;
-  }],
-  s: [twoDigits, function (d, v) {
-    d.second = v;
-  }],
-  YYYY: [fourDigits, function (d, v) {
-    d.year = v;
-  }],
-  S: ['\\d', function (d, v) {
-    d.millisecond = v * 100;
-  }],
-  SS: ['\\d{2}', function (d, v) {
-    d.millisecond = v * 10;
-  }],
-  SSS: [threeDigits, function (d, v) {
-    d.millisecond = v;
-  }],
-  d: [twoDigits, noop],
-  ddd: [word, noop],
-  MMM: [word, monthUpdate('monthNamesShort')],
-  MMMM: [word, monthUpdate('monthNames')],
-  a: [word, function (d, v, i18n) {
-    var val = v.toLowerCase();
-    if (val === i18n.amPm[0]) {
-      d.isPm = false;
-    } else if (val === i18n.amPm[1]) {
-      d.isPm = true;
-    }
-  }],
-  ZZ: ['[^\\s]*?[\\+\\-]\\d\\d:?\\d\\d|[^\\s]*?Z', function (d, v) {
-    var parts = (v + '').match(/([+-]|\d\d)/gi), minutes;
+    D: [twoDigits, function (d, v) {
+        d.day = v;
+    }],
+    Do: [twoDigits + word, function (d, v) {
+        d.day = parseInt(v, 10);
+    }],
+    M: [twoDigits, function (d, v) {
+        d.month = v - 1;
+    }],
+    YY: [twoDigits, function (d, v) {
+        var da = new Date(), cent = +('' + da.getFullYear()).substr(0, 2);
+        d.year = '' + (v > 68 ? cent - 1 : cent) + v;
+    }],
+    h: [twoDigits, function (d, v) {
+        d.hour = v;
+    }],
+    m: [twoDigits, function (d, v) {
+        d.minute = v;
+    }],
+    s: [twoDigits, function (d, v) {
+        d.second = v;
+    }],
+    YYYY: [fourDigits, function (d, v) {
+        d.year = v;
+    }],
+    S: ['\\d', function (d, v) {
+        d.millisecond = v * 100;
+    }],
+    SS: ['\\d{2}', function (d, v) {
+        d.millisecond = v * 10;
+    }],
+    SSS: [threeDigits, function (d, v) {
+        d.millisecond = v;
+    }],
+    d: [twoDigits, noop],
+    ddd: [word, noop],
+    MMM: [word, monthUpdate('monthNamesShort')],
+    MMMM: [word, monthUpdate('monthNames')],
+    a: [word, function (d, v, i18n) {
+        var val = v.toLowerCase();
+        if (val === i18n.amPm[0]) {
+            d.isPm = false;
+        } else if (val === i18n.amPm[1]) {
+            d.isPm = true;
+        }
+    }],
+    ZZ: ['[^\\s]*?[\\+\\-]\\d\\d:?\\d\\d|[^\\s]*?Z', function (d, v) {
+        var parts = (v + '').match(/([+-]|\d\d)/gi), minutes;
 
-    if (parts) {
-      minutes = +(parts[1] * 60) + parseInt(parts[2], 10);
-      d.timezoneOffset = parts[0] === '+' ? minutes : -minutes;
-    }
-  }]
+        if (parts) {
+            minutes = +(parts[1] * 60) + parseInt(parts[2], 10);
+            d.timezoneOffset = parts[0] === '+' ? minutes : -minutes;
+        }
+    }]
 };
 parseFlags.dd = parseFlags.d;
 parseFlags.dddd = parseFlags.ddd;
@@ -2714,14 +2716,14 @@ parseFlags.A = parseFlags.a;
 
 // Some common format strings
 fecha.masks = {
-  default: 'ddd MMM DD YYYY HH:mm:ss',
-  shortDate: 'M/D/YY',
-  mediumDate: 'MMM D, YYYY',
-  longDate: 'MMMM D, YYYY',
-  fullDate: 'dddd, MMMM D, YYYY',
-  shortTime: 'HH:mm',
-  mediumTime: 'HH:mm:ss',
-  longTime: 'HH:mm:ss.SSS'
+    default: 'ddd MMM DD YYYY HH:mm:ss',
+    shortDate: 'M/D/YY',
+    mediumDate: 'MMM D, YYYY',
+    longDate: 'MMMM D, YYYY',
+    fullDate: 'dddd, MMMM D, YYYY',
+    shortTime: 'HH:mm',
+    mediumTime: 'HH:mm:ss',
+    longTime: 'HH:mm:ss.SSS'
 };
 
 /***
@@ -2731,33 +2733,33 @@ fecha.masks = {
  * @param {string} mask Format of the date, i.e. 'mm-dd-yy' or 'shortDate'
  */
 fecha.format = function (dateObj, mask, i18nSettings) {
-  var i18n = i18nSettings || fecha.i18n;
+    var i18n = i18nSettings || fecha.i18n;
 
-  if (typeof dateObj === 'number') {
-    dateObj = new Date(dateObj);
-  }
+    if (typeof dateObj === 'number') {
+        dateObj = new Date(dateObj);
+    }
 
-  if (Object.prototype.toString.call(dateObj) !== '[object Date]' || isNaN(dateObj.getTime())) {
-    throw new Error('Invalid Date in fecha.format');
-  }
+    if (Object.prototype.toString.call(dateObj) !== '[object Date]' || isNaN(dateObj.getTime())) {
+        throw new Error('Invalid Date in fecha.format');
+    }
 
-  mask = fecha.masks[mask] || mask || fecha.masks['default'];
+    mask = fecha.masks[mask] || mask || fecha.masks['default'];
 
-  var literals = [];
+    var literals = [];
 
-  // Make literals inactive by replacing them with ??
-  mask = mask.replace(literal, function($0, $1) {
-    literals.push($1);
-    return '@@@';
-  });
-  // Apply formatting rules
-  mask = mask.replace(token, function ($0) {
-    return $0 in formatFlags ? formatFlags[$0](dateObj, i18n) : $0.slice(1, $0.length - 1);
-  });
-  // Inline literal values back into the formatted value
-  return mask.replace(/@@@/g, function() {
-    return literals.shift();
-  });
+    // Make literals inactive by replacing them with ??
+    mask = mask.replace(literal, function ($0, $1) {
+        literals.push($1);
+        return '@@@';
+    });
+    // Apply formatting rules
+    mask = mask.replace(token, function ($0) {
+        return $0 in formatFlags ? formatFlags[$0](dateObj, i18n) : $0.slice(1, $0.length - 1);
+    });
+    // Inline literal values back into the formatted value
+    return mask.replace(/@@@/g, function () {
+        return literals.shift();
+    });
 };
 
 /**
@@ -2768,74 +2770,200 @@ fecha.format = function (dateObj, mask, i18nSettings) {
  * @returns {Date|boolean}
  */
 fecha.parse = function (dateStr, format, i18nSettings) {
-  var i18n = i18nSettings || fecha.i18n;
+    var i18n = i18nSettings || fecha.i18n;
 
-  if (typeof format !== 'string') {
-    throw new Error('Invalid format in fecha.parse');
-  }
-
-  format = fecha.masks[format] || format;
-
-  // Avoid regular expression denial of service, fail early for really long strings
-  // https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS
-  if (dateStr.length > 1000) {
-    return null;
-  }
-
-  var dateInfo = {};
-  var parseInfo = [];
-  var literals = [];
-  format = format.replace(literal, function($0, $1) {
-    literals.push($1);
-    return '@@@';
-  });
-  var newFormat = regexEscape(format).replace(token, function ($0) {
-    if (parseFlags[$0]) {
-      var info = parseFlags[$0];
-      parseInfo.push(info[1]);
-      return '(' + info[0] + ')';
+    if (typeof format !== 'string') {
+        throw new Error('Invalid format in fecha.parse');
     }
 
-    return $0;
-  });
-  newFormat = newFormat.replace(/@@@/g, function() {
-    return literals.shift();
-  });
-  var matches = dateStr.match(new RegExp(newFormat, 'i'));
-  if (!matches) {
-    return null;
-  }
+    format = fecha.masks[format] || format;
 
-  for (var i = 1; i < matches.length; i++) {
-    parseInfo[i - 1](dateInfo, matches[i], i18n);
-  }
+    // Avoid regular expression denial of service, fail early for really long strings
+    // https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS
+    if (dateStr.length > 1000) {
+        return null;
+    }
 
-  var today = new Date();
-  if (dateInfo.isPm === true && dateInfo.hour != null && +dateInfo.hour !== 12) {
-    dateInfo.hour = +dateInfo.hour + 12;
-  } else if (dateInfo.isPm === false && +dateInfo.hour === 12) {
-    dateInfo.hour = 0;
-  }
+    var dateInfo = {};
+    var parseInfo = [];
+    var literals = [];
+    format = format.replace(literal, function ($0, $1) {
+        literals.push($1);
+        return '@@@';
+    });
+    var newFormat = regexEscape(format).replace(token, function ($0) {
+        if (parseFlags[$0]) {
+            var info = parseFlags[$0];
+            parseInfo.push(info[1]);
+            return '(' + info[0] + ')';
+        }
 
-  var date;
-  if (dateInfo.timezoneOffset != null) {
-    dateInfo.minute = +(dateInfo.minute || 0) - +dateInfo.timezoneOffset;
-    date = new Date(Date.UTC(dateInfo.year || today.getFullYear(), dateInfo.month || 0, dateInfo.day || 1,
-      dateInfo.hour || 0, dateInfo.minute || 0, dateInfo.second || 0, dateInfo.millisecond || 0));
-  } else {
-    date = new Date(dateInfo.year || today.getFullYear(), dateInfo.month || 0, dateInfo.day || 1,
-      dateInfo.hour || 0, dateInfo.minute || 0, dateInfo.second || 0, dateInfo.millisecond || 0);
-  }
-  return date;
+        return $0;
+    });
+    newFormat = newFormat.replace(/@@@/g, function () {
+        return literals.shift();
+    });
+    var matches = dateStr.match(new RegExp(newFormat, 'i'));
+    if (!matches) {
+        return null;
+    }
+
+    for (var i = 1; i < matches.length; i++) {
+        parseInfo[i - 1](dateInfo, matches[i], i18n);
+    }
+
+    var today = new Date();
+    if (dateInfo.isPm === true && dateInfo.hour != null && +dateInfo.hour !== 12) {
+        dateInfo.hour = +dateInfo.hour + 12;
+    } else if (dateInfo.isPm === false && +dateInfo.hour === 12) {
+        dateInfo.hour = 0;
+    }
+
+    var date;
+    if (dateInfo.timezoneOffset != null) {
+        dateInfo.minute = +(dateInfo.minute || 0) - +dateInfo.timezoneOffset;
+        date = new Date(Date.UTC(dateInfo.year || today.getFullYear(), dateInfo.month || 0, dateInfo.day || 1,
+            dateInfo.hour || 0, dateInfo.minute || 0, dateInfo.second || 0, dateInfo.millisecond || 0));
+    } else {
+        date = new Date(dateInfo.year || today.getFullYear(), dateInfo.month || 0, dateInfo.day || 1,
+            dateInfo.hour || 0, dateInfo.minute || 0, dateInfo.second || 0, dateInfo.millisecond || 0);
+    }
+    return date;
 };
 
-var a=function(){try{(new Date).toLocaleDateString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleDateString(t,{year:"numeric",month:"long",day:"numeric"})}:function(t){return fecha.format(t,"mediumDate")},n=function(){try{(new Date).toLocaleString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleString(t,{year:"numeric",month:"long",day:"numeric",hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"haDateTime")},r=function(){try{(new Date).toLocaleTimeString("i");}catch(e){return "RangeError"===e.name}return !1}()?function(e,t){return e.toLocaleTimeString(t,{hour:"numeric",minute:"2-digit"})}:function(t){return fecha.format(t,"shortTime")};var A=function(e,t,a,n){n=n||{},a=null==a?{}:a;var r=new Event(t,{bubbles:void 0===n.bubbles||n.bubbles,cancelable:Boolean(n.cancelable),composed:void 0===n.composed||n.composed});return r.detail=a,e.dispatchEvent(r),r};
+var a = function () { try { (new Date).toLocaleDateString("i"); } catch (e) { return "RangeError" === e.name } return !1 }() ? function (e, t) { return e.toLocaleDateString(t, { year: "numeric", month: "long", day: "numeric" }) } : function (t) { return fecha.format(t, "mediumDate") }, n = function () { try { (new Date).toLocaleString("i"); } catch (e) { return "RangeError" === e.name } return !1 }() ? function (e, t) { return e.toLocaleString(t, { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) } : function (t) { return fecha.format(t, "haDateTime") }, r = function () { try { (new Date).toLocaleTimeString("i"); } catch (e) { return "RangeError" === e.name } return !1 }() ? function (e, t) { return e.toLocaleTimeString(t, { hour: "numeric", minute: "2-digit" }) } : function (t) { return fecha.format(t, "shortTime") }; var A = function (e, t, a, n) { n = n || {}, a = null == a ? {} : a; var r = new Event(t, { bubbles: void 0 === n.bubbles || n.bubbles, cancelable: Boolean(n.cancelable), composed: void 0 === n.composed || n.composed }); return r.detail = a, e.dispatchEvent(r), r };
 
 const CARD_VERSION = '1.0.6';
+
+let PodcastCardEditor = class PodcastCardEditor extends LitElement {
+    setConfig(config) {
+        this._config = config;
+    }
+    get _name() {
+        return this._config.name || "";
+    }
+    get _entity() {
+        return this._config.entity || "";
+    }
+    get _icon() {
+        return this._config.icon || "";
+    }
+    get _default_target() {
+        return this._config.default_target || "";
+    }
+    get _show_player() {
+        return this._config.show_player || true;
+    }
+    get _custom_player() {
+        return this._config.custom_player || false;
+    }
+    get _mime_type() {
+        return this._config.mime_type || "";
+    }
+    render() {
+        if (!this.hass) {
+            return html``;
+        }
+        const entities = Object.keys(this.hass.states).filter(eid => eid.substr(0, eid.indexOf(".")) === "media_player");
+        return html`
+      <div class="card-config">
+        <paper-dropdown-menu
+          label="Entity"
+          @value-changed=${this._valueChanged}
+          .configValue=${"entity"}
+        >
+          <paper-listbox
+            slot="dropdown-content"
+            .selected=${entities.indexOf(this._entity)}
+          >
+            ${entities.map(entity => {
+            return html`
+                <paper-item>${entity}</paper-item>
+              `;
+        })}
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-input
+          label="Name (Optional)"
+          .value=${this._name}
+          .configValue=${"name"}
+          @value-changed=${this._valueChanged}
+        ></paper-input>
+        <paper-input
+          label="Icon (Optional)"
+          .value=${this._icon}
+          .configValue=${"icon"}
+          @value-changed=${this._valueChanged}
+        ></paper-input>
+        <paper-dropdown-menu
+          label="Default Target"
+          @value-changed=${this._valueChanged}
+          .configValue=${"default_target"}
+        >
+          <paper-listbox
+            slot="dropdown-content"
+            .selected=${entities.indexOf(this._default_target)}
+          >
+            ${entities.map(entity => {
+            return html`
+                <paper-item>${entity}</paper-item>
+              `;
+        })}
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-toggle-button
+          ?checked="${this._show_player !== false}"
+          .configValue=${"show_player"}
+          @change=${this._valueChanged}
+          >Show Player?</paper-toggle-button
+        >
+        <paper-toggle-button
+          ?checked="${this._custom_player !== false}"
+          .configValue=${"custom_player"}
+          @change=${this._valueChanged}
+          >Use mini-media-player?</paper-toggle-button
+        >
+      </div>
+    `;
+    }
+    _valueChanged(ev) {
+        if (!this._config || !this.hass) {
+            return;
+        }
+        const target = ev.target;
+        if (this[`_${target.configValue}`] === target.value) {
+            return;
+        }
+        if (target.configValue) {
+            if (target.value === "") {
+                delete this._config[target.configValue];
+            }
+            else {
+                this._config = Object.assign(Object.assign({}, this._config), { [target.configValue]: target.checked !== undefined ? target.checked : target.value });
+            }
+        }
+        A(this, "config-changed", { config: this._config });
+    }
+};
+__decorate([
+    property()
+], PodcastCardEditor.prototype, "hass", void 0);
+__decorate([
+    property()
+], PodcastCardEditor.prototype, "_config", void 0);
+PodcastCardEditor = __decorate([
+    customElement("podcast-card-editor")
+], PodcastCardEditor);
 
 /* eslint no-console: 0 */
 console.info(`%c  PODCAST-CARD  \n%c  Version ${CARD_VERSION} `, "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
 let PodcastCard = class PodcastCard extends LitElement {
+    static async getConfigElement() {
+        return document.createElement("podcast-card-editor");
+    }
+    static getStubConfig() {
+        return {};
+    }
     setConfig(config) {
         if (!config || !config.entity) {
             throw new Error("Invalid configuration");
@@ -2866,11 +2994,11 @@ let PodcastCard = class PodcastCard extends LitElement {
     }
     render() {
         if (!this._config || !this.hass) {
-            return html ``;
+            return html``;
         }
         const stateObj = this.hass.states[this._config.entity];
         if (!stateObj) {
-            return html `
+            return html`
         <ha-card>
           <div class="warning">
             Entity not available: ${this._config.entity}
@@ -2896,7 +3024,7 @@ let PodcastCard = class PodcastCard extends LitElement {
                 entity: this._selectedPlayer
             });
         player.hass = this.hass;
-        return html `
+        return html`
       <ha-card>
         <div class="header">
           <paper-menu-button>
@@ -2904,13 +3032,13 @@ let PodcastCard = class PodcastCard extends LitElement {
               .icon="${this._config.icon || "mdi:speaker-multiple"}"
               slot="dropdown-trigger"
               >${this.hass.states[this._selectedPlayer].attributes
-            .friendly_name}</paper-icon-button
+                .friendly_name}</paper-icon-button
             >
             <paper-listbox slot="dropdown-content">
-              ${entityIds.map(entity => html `
+              ${entityIds.map(entity => html`
                   <paper-item @click="${this._valueChanged}" .entity="${entity}"
                     >${this.hass.states[entity].attributes
-            .friendly_name}</paper-item
+                        .friendly_name}</paper-item
                   >
                 `)}
             </paper-listbox>
@@ -2921,12 +3049,12 @@ let PodcastCard = class PodcastCard extends LitElement {
         </div>
         <div id="player">
           ${this._config.show_player
-            ? html `
+                ? html`
                 ${player}
               `
-            : ""}
+                : ""}
         </div>
-        ${podcasts.map((podcast, index) => html `
+        ${podcasts.map((podcast, index) => html`
               <div class="divider"></div>
               <paper-item
                 @click="${this._togglePodcastEpisodes}"
@@ -2935,7 +3063,7 @@ let PodcastCard = class PodcastCard extends LitElement {
                 ${podcast.title}
               </paper-item>
               <div class="episodes" id="podcast${index}">
-                ${podcast.episodes.map(episode => html `
+                ${podcast.episodes.map(episode => html`
                       <paper-item
                         @click="${this._playEpisode}"
                         .url="${episode.url}"
@@ -2955,7 +3083,7 @@ let PodcastCard = class PodcastCard extends LitElement {
     `;
     }
     static get styles() {
-        return css `
+        return css`
       .warning {
         display: block;
         color: black;

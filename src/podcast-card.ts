@@ -8,10 +8,16 @@ import {
   CSSResult,
   PropertyValues
 } from "lit-element";
-import { HomeAssistant, fireEvent } from "custom-card-helpers";
+import {
+  HomeAssistant,
+  fireEvent,
+  LovelaceCardEditor
+} from "custom-card-helpers";
 
 import { PodcastCardConfig, Podcast } from "./types";
 import { CARD_VERSION } from "./const";
+
+import "./podcast-card-editor";
 
 /* eslint no-console: 0 */
 console.info(
@@ -22,6 +28,14 @@ console.info(
 
 @customElement("podcast-card")
 class PodcastCard extends LitElement {
+  public static async getConfigElement(): Promise<LovelaceCardEditor> {
+    return document.createElement("podcast-card-editor") as LovelaceCardEditor;
+  }
+
+  public static getStubConfig(): object {
+    return {};
+  }
+
   @property() public hass?: HomeAssistant;
   @property() private _config?: PodcastCardConfig;
   @property() private _selectedPlayer?: string;
@@ -146,8 +160,8 @@ class PodcastCard extends LitElement {
             html`
               <div class="divider"></div>
               <paper-item
-                @click="${this._togglePodcastEpisodes}"
-                .podcast="${index}"
+                @click=${this._togglePodcastEpisodes}
+                .podcast=${index}
               >
                 ${podcast.title}
               </paper-item>
