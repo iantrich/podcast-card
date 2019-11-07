@@ -6,6 +6,5 @@ views:
       - type: "custom:podcast-card"
         entity: sensor.gpodder
         name: Ian's Podcasts
-        default_target: media_player.office_home
         show_player: true
-        custom_player: true
+        custom_player: false

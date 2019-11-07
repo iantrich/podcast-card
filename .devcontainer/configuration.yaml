@@ -2,3 +2,102 @@ default_config:
 lovelace:
   mode: yaml
 demo:
+homeassistant:
+  customize:
+    sensor.gpodder:
+      podcasts:
+        [
+          {
+            "title": "Fresh Air",
+            "link": "http://www.npr.org/programs/fresh-air/",
+            "description": "Fresh Air from WHYY, the Peabody Award-winning weekday magazine of contemporary arts and issues, is one of public radio's most popular programs. Hosted by Terry Gross, the show features intimate conversations with today's biggest luminaries.",
+            "cover_url": "",
+            "episodes":
+              [
+                {
+                  "title": "Writer Saeed Jones On 'How We Fight For Our Lives'",
+                  "description": "\"It was perilous to be a black gay boy in America,\" Jones says of the fear and isolation he experienced growing up in Texas in the 1990s. Jones, a former culture editor and LGBTQ editor at BuzzFeed, talks about his search for identity and being \"mad as hell and gay as hell.\" His new memoir is 'How We Fight for Our Lives.'\n\nAlso, classical music critic Lloyd Schwartz reviews two contemporary operas.",
+                  "url": "https://play.podtrac.com/npr-381444908/edge1.pod.npr.org/anon.npr-podcasts/podcast/npr/fa/2019/11/20191106_fa_podcastedit_1106_adjusted-99593803-2ddd-43e5-847e-d0c77b0012eb.mp3?awCollectionId=381444908&awEpisodeId=776790360&orgId=1&d=2946&p=381444908&story=776790360&t=podcast&e=776790360&size=47040725&ft=pod&f=381444908",
+                  "mime_type": "audio/mpeg",
+                  "guid": "http://www.npr.org/rss/cf186593-c0df-415c-b6e3-60a40c619e35",
+                  "link": "https://www.npr.org/2019/11/06/776790360/writer-saeed-jones-on-how-we-fight-for-our-lives",
+                  "published": 1573075812,
+                  "total_time": 2946,
+                },
+              ],
+          },
+          {
+            "title": "Home Assistant Podcast",
+            "link": "https://hasspodcast.io/",
+            "description":
+              "Join hosts Phil Hawthorne and Rohan Karamandi each fortnight as they
+              explore the newest Home Assistant release and the latest Home Automation
+              news. Featuring guests who use or contribute to Home Assistant, the
+              podcast aims to inspire new ways to make your home smarter.",
+            "cover_url": "",
+            "episodes":
+              [
+                {
+                  "title":
+                    "Home Assistant Podcast 58 – 0.101, Switchbot Curtain and talking to
+                    Stephan",
+                  "description":
+                    "Rohan and Phil and joined by Stephan from New Zealand to talk 0.101,
+                    the Switchbot Curtain Kickstarter and Stephans use of Home Assistant
+                    For complete show notes and more information about the topics
+                    discussed in this episode, be sure to check the notes at
+                    https://hasspodcast.io/ha058/ This episode was made possible thanks to
+                    our sponsor Home Assistant Cloud by Nabu Casa Easily connect to Google
+                    and Amazon voice assistants for a small monthly fee that also supports
+                    the Home Assistant project. Configuration is via the User Interface so
+                    no fiddling with router settings, dynamic DNS or YAML. Website:
+                    https://nabucasa.com Special thanks to todays guest Stephan McKillen
+                    Home Assistant Config: https://github.com/MYLE-01/MySmarthouse -----
+                    Hosts ----- Phil Hawthorne Website: https://philhawthorne.com Smart
+                    Home Products: https://kit.com/philhawthorne Twitter:
+                    https://twitter.com/philhawthorne Buy Phil a Coffee:
+                    https://buymeacoff.ee/philhawthorne Rohan Karamandi Website:
+                    https://karamandi.com Smart Home Products: https://kit.com/rkaramandi/
+                    Twitter: https://twitter.com/rohank9 Buy Rohan a Coffee:
+                    https://buymeacoff.ee/rkaramandi",
+                  "url": "https://dts.podtrac.com/redirect.mp3/hasspodcast.io/podcast-download/516/ha058.mp3",
+                  "mime_type": "audio/mpeg",
+                  "guid": "https://hasspodcast.io/?p=516",
+                  "link": "https://hasspodcast.io/ha058/",
+                  "published": 1572476407,
+                  "total_time": 3642,
+                },
+                {
+                  "title":
+                    "Home Assistant Podcast 57 – 0.100, Hacktoberfest 2019 and wireless
+                    technologies with Tony",
+                  "description":
+                    "Rohan and Phil are joined by Tony to talk 0.100, Hacktoberfest and
+                    learn about Tony’s smart home For complete show notes and more
+                    information about the topics discussed in this episode, be sure to
+                    check the notes at https://hasspodcast.io/ha057/ Special thanks to
+                    todays guest Tony Lamont ----- Hosts ----- Phil Hawthorne Website:
+                    https://philhawthorne.com Smart Home Products:
+                    https://kit.com/philhawthorne Twitter:
+                    https://twitter.com/philhawthorne Buy Phil a Coffee:
+                    https://buymeacoff.ee/philhawthorne Rohan Karamandi Website:
+                    https://karamandi.com Smart Home Products: https://kit.com/rkaramandi/
+                    Twitter: https://twitter.com/rohank9 Buy Rohan a Coffee:
+                    https://buymeacoff.ee/rkaramandi",
+                  "url": "https://dts.podtrac.com/redirect.mp3/hasspodcast.io/podcast-download/508/ha057.mp3",
+                  "mime_type": "audio/mpeg",
+                  "guid": "https://hasspodcast.io/?p=508",
+                  "link": "https://hasspodcast.io/ha057/",
+                  "published": 1570662024,
+                  "total_time": 3560,
+                },
+              ],
+          },
+        ]
+
+sensor:
+  - platform: template
+    sensors:
+      gpodder:
+        value_template: 1
+        icon_template: "mdi:headphones"
