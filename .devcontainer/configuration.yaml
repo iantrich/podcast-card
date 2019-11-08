@@ -99,5 +99,5 @@ sensor:
   - platform: template
     sensors:
       gpodder:
-        value_template: 1
+        value_template: 2
         icon_template: "mdi:headphones"
