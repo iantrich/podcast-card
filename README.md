@@ -1,3 +1,5 @@
+Archived: Recommend switching to https://www.music-assistant.io/
+
 # Podcast Card
 
 🎧 [gPodder](https://gpodder.net/) Podcast Card
